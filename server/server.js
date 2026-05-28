@@ -1,11 +1,6 @@
-
 import dotenv from "dotenv";
 
 import path from "path";
-
-import express from "express";
-
-import cors from "cors";
 
 // ========================================
 // LOAD ENV
@@ -13,15 +8,11 @@ import cors from "cors";
 
 dotenv.config();
 
-// ========================================
-// DATABASE
-// ========================================
+import express from "express";
+
+import cors from "cors";
 
 import connectDB from "./config/db.js";
-
-// ========================================
-// ROUTES
-// ========================================
 
 import authRoutes from "./routes/authRoutes.js";
 
@@ -43,14 +34,21 @@ connectDB();
 
 const app = express();
 
+
+
 // ========================================
-// CORS CONFIG
+// CORS
 // ========================================
+
 
 const allowedOrigins = [
 
+  "http://localhost:5173",
+
   "https://ai-hr-recruite-system-t9mr.vercel.app",
 ];
+
+
 
 app.use(
 
@@ -61,7 +59,8 @@ app.use(
       callback
     ) {
 
-      // ALLOW POSTMAN / MOBILE
+      // ALLOW NO ORIGIN
+      // (POSTMAN / MOBILE)
 
       if (!origin) {
 
@@ -71,7 +70,7 @@ app.use(
         );
       }
 
-      // CHECK FRONTEND URL
+      // CHECK ORIGIN
 
       if (
         allowedOrigins.includes(
@@ -87,7 +86,6 @@ app.use(
       } else {
 
         callback(
-
           new Error(
             "CORS Not Allowed"
           )
@@ -114,15 +112,13 @@ app.use(
   })
 );
 
-// ========================================
 // HANDLE PREFLIGHT
-// ========================================
 
 app.options("*", cors());
 
-// ========================================
-// BODY PARSER
-// ========================================
+
+
+
 
 app.use(express.json());
 
@@ -134,27 +130,44 @@ app.use(
   })
 );
 
+
+
+
+
+
+app.use(express.json());
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
+// ========================================
+// STATIC UPLOADS
+// ========================================
+
 // ========================================
 // STATIC UPLOADS
 // ========================================
 
 app.use(
-
   "/uploads",
-
   express.static(
-
     path.join(
-
       process.cwd(),
-
       "uploads"
     )
   )
 );
 
+app.use(
+  "/uploads",
+  express.static("uploads")
+);
+
 // ========================================
-// API ROUTES
+// ROUTES
 // ========================================
 
 app.use(
@@ -172,25 +185,37 @@ app.use(
   candidateRoutes
 );
 
+
 app.use(
   "/api/employee",
   employeeRoutes
 );
+
+
 
 // ========================================
 // DEFAULT ROUTE
 // ========================================
 
 app.get("/", (req, res) => {
-
   res.send(
     "AI HR Platform API Running"
   );
 });
 
 // ========================================
-// EXPORT APP
+// PORT
 // ========================================
 
-export default app;
+const PORT =
+  process.env.PORT || 5000;
 
+// ========================================
+// SERVER
+// ========================================
+
+app.listen(PORT, () => {
+  console.log(
+    `Server running on port ${PORT}`
+  );
+});

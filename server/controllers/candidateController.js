@@ -11,7 +11,7 @@ import fs from "fs";
 
 import axios from "axios";
 
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+
 
 import Tesseract from "tesseract.js";
 
@@ -22,6 +22,7 @@ import Tesseract from "tesseract.js";
 const HF_TOKEN =
   process.env.HUGGINGFACE_API_KEY;
 
+
 // ========================================
 // GET JOBS
 // ========================================
@@ -31,22 +32,43 @@ export const getJobs =
 
     try {
 
-      const jobs =
-        await Job.find();
+      console.log(
+        "GET JOBS API CALLED"
+      );
 
-      res.json(jobs);
+      const jobs =
+        await Job.find()
+
+        .sort({
+          createdAt: -1,
+        });
+
+      return res.status(200).json(
+        jobs
+      );
 
     } catch (error) {
 
-      console.log(error);
+      console.log(
+        "GET JOBS ERROR:",
+        error
+      );
 
-      res.status(500).json({
+      return res.status(500).json({
+
+        success: false,
 
         message:
           "Failed to fetch jobs",
+
+        error:
+          error.message,
       });
     }
   };
+
+
+
 
 // ========================================
 // PDF TEXT EXTRACTION
@@ -57,46 +79,30 @@ const extractPDFText =
 
     try {
 
-      const data =
-        new Uint8Array(
-          fs.readFileSync(
-            filePath
-          )
+      // DYNAMIC IMPORT
+
+      const pdfParseModule =
+        await import(
+          "pdf-parse"
         );
 
-      const pdf =
-        await pdfjsLib.getDocument({
-          data,
-        }).promise;
+      const pdfParse =
+        pdfParseModule.default;
 
-      let text = "";
+      const dataBuffer =
+        fs.readFileSync(
+          filePath
+        );
 
-      for (
-        let i = 1;
-        i <= pdf.numPages;
-        i++
-      ) {
+      const data =
+        await pdfParse(
+          dataBuffer
+        );
 
-        const page =
-          await pdf.getPage(i);
+      let text =
+        data.text || "";
 
-        const content =
-          await page.getTextContent();
-
-        const strings =
-          content.items.map(
-            (item) =>
-              item.str
-          );
-
-        text +=
-          strings.join(" ") +
-          "\n";
-      }
-
-      // ========================================
-      // EMPTY PDF FALLBACK
-      // ========================================
+      // FALLBACK
 
       if (
         text.trim().length < 20
@@ -122,7 +128,9 @@ REST API
     } catch (error) {
 
       console.log(
+
         "PDF Extraction Error:",
+
         error
       );
 
@@ -140,6 +148,10 @@ REST API
 `;
     }
   };
+
+
+
+
 
 // ========================================
 // ATS ENGINE

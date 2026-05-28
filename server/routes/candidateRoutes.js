@@ -32,8 +32,7 @@ router.get(
 
   "/jobs",
 
-  protect,
-
+ 
   getJobs
 );
 

@@ -38,13 +38,14 @@ const app = express();
 // MIDDLEWARE
 // ========================================
 
+
 app.use(
 
   cors({
 
     origin: [
 
-      "https://ai-hr-recruite-system-ctlf.vercel.app",
+      "https://ai-hr-recruite-system-t9mr.vercel.app",
     ],
 
     credentials: true,
@@ -65,6 +66,7 @@ app.use(
     ],
   })
 );
+
 
 
 

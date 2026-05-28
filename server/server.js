@@ -34,19 +34,17 @@ connectDB();
 
 const app = express();
 
+
 // ========================================
 // MIDDLEWARE
 // ========================================
-
 
 app.use(
 
   cors({
 
-    origin: [
-
+    origin:
       "https://ai-hr-recruite-system-t9mr.vercel.app",
-    ],
 
     credentials: true,
 
@@ -66,6 +64,25 @@ app.use(
     ],
   })
 );
+
+// HANDLE PREFLIGHT REQUESTS
+
+app.options(
+  "*",
+  cors()
+);
+
+app.use(express.json());
+
+app.use(
+
+  express.urlencoded({
+
+    extended: true,
+  })
+);
+
+
 
 
 

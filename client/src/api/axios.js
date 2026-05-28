@@ -44,6 +44,11 @@ API.interceptors.request.use(
         "token"
       );
 
+    console.log(
+      "TOKEN:",
+      token
+    );
+
     if (token) {
 
       config.headers.Authorization =
@@ -76,8 +81,27 @@ API.interceptors.response.use(
 
     console.log(
       "API ERROR:",
-      error
+      error.response
     );
+
+    // AUTO LOGOUT
+
+    if (
+      error.response &&
+      error.response.status === 401
+    ) {
+
+      localStorage.removeItem(
+        "token"
+      );
+
+      localStorage.removeItem(
+        "user"
+      );
+
+      window.location.href =
+        "/login";
+    }
 
     return Promise.reject(
       error

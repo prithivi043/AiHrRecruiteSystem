@@ -42,14 +42,41 @@ const Login = () => {
       try {
         setLoading(true);
 
-        const data =
-          await loginUser(
-            formData
-          );
-
-        alert(
-          "Login Successful"
+       
+      const data =
+        await loginUser(
+          formData
         );
+
+// ========================================
+// SAVE TOKEN
+// ========================================
+
+localStorage.setItem(
+
+  "token",
+
+  data.token
+);
+
+// ========================================
+// SAVE USER
+// ========================================
+
+localStorage.setItem(
+
+  "user",
+
+  JSON.stringify(
+    data.user
+  )
+);
+
+alert(
+  "Login Successful"
+);
+
+
 
         // Navigate Based On Role
 
